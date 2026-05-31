@@ -1,9 +1,9 @@
-package com.example.BoxFit;
+package com.boxfit.backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+@SpringBootTest(classes = com.boxfit.backend.BoxFitApplication.class)
 class BoxFitApplicationTests {
 
 	@Test
