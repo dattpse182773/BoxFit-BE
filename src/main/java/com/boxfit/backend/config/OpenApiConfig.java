@@ -13,6 +13,6 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .components(new Components())
-                .info(new Info().title("BoxFit API").version("v1"));
+                .info(new Info().title("BoxFit").version("v1"));
     }
 }
