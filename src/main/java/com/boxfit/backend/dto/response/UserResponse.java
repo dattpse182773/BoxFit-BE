@@ -1,6 +1,5 @@
 package com.boxfit.backend.dto.response;
 
-import com.boxfit.backend.domain.enums.Role;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -9,7 +8,7 @@ public class UserResponse {
     private String email;
     private String fullName;
     private String phoneNumber;
-    private Role role;
+    private String role;
     private boolean isActive;
     private Instant createdAt;
     private Instant updatedAt;
@@ -26,8 +25,8 @@ public class UserResponse {
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
 
-    public Role getRole() { return role; }
-    public void setRole(Role role) { this.role = role; }
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 
     public boolean isActive() { return isActive; }
     public void setActive(boolean active) { isActive = active; }

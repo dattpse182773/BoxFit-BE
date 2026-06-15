@@ -1,0 +1,251 @@
+{
+  "info": {
+    "_postman_id": "7d7f0fb3-84f9-48b0-9c47-6b5d7bbdc9c2",
+    "name": "BoxFit Admin Local - Port 8080",
+    "description": "Single-file Postman collection for local admin JWT smoke tests. Variables are stored in this collection, so no separate Postman environment file is required.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "adminEmail",
+      "value": "admin@boxfit.local",
+      "type": "string"
+    },
+    {
+      "key": "adminPassword",
+      "value": "admin123",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminUserId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "imageUrl",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Admin Auth",
+      "item": [
+        {
+          "name": "01 Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var json = pm.response.json();",
+                  "",
+                  "pm.test('Response success is true', function () {",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "});",
+                  "",
+                  "pm.test('Access token exists', function () {",
+                  "  pm.expect(json.data).to.have.property('accessToken');",
+                  "  pm.expect(json.data.accessToken).to.be.a('string').and.not.empty;",
+                  "});",
+                  "",
+                  "pm.test('Logged in user is ADMIN', function () {",
+                  "  pm.expect(json.data.user.role).to.eql('ADMIN');",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('accessToken', json.data.accessToken);",
+                  "if (json.data.user && json.data.user.id) {",
+                  "  pm.collectionVariables.set('adminUserId', json.data.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            },
+            "url": "{{baseUrl}}/api/auth/login",
+            "description": "Login with the seeded admin account and save accessToken into collection variables."
+          },
+          "response": []
+        },
+        {
+          "name": "02 Get Current Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var json = pm.response.json();",
+                  "",
+                  "pm.test('Response success is true', function () {",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "});",
+                  "",
+                  "pm.test('Current user is ADMIN', function () {",
+                  "  pm.expect(json.data.email).to.eql(pm.collectionVariables.get('adminEmail'));",
+                  "  pm.expect(json.data.role).to.eql('ADMIN');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/me",
+            "description": "Verify the saved JWT can access the protected current-user endpoint."
+          },
+          "response": []
+        },
+        {
+          "name": "03 Upload Product Image",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var json = pm.response.json();",
+                  "",
+                  "pm.test('Response success is true', function () {",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "});",
+                  "",
+                  "pm.test('Image URL exists', function () {",
+                  "  pm.expect(json.data).to.have.property('url');",
+                  "  pm.expect(json.data.url).to.be.a('string').and.not.empty;",
+                  "});",
+                  "",
+                  "pm.collectionVariables.set('imageUrl', json.data.url);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/api/admin/products/image",
+            "description": "Upload one product image to S3 and save the returned public URL into imageUrl."
+          },
+          "response": []
+        },
+        {
+          "name": "04 Logout Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var json = pm.response.json();",
+                  "",
+                  "pm.test('Logout success is true', function () {",
+                  "  pm.expect(json.success).to.eql(true);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/logout",
+            "description": "Blacklist the current admin JWT."
+          },
+          "response": []
+        },
+        {
+          "name": "05 Verify Token Is Blacklisted",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status is 401', function () {",
+                  "  pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": "{{baseUrl}}/api/auth/me",
+            "description": "The same token should fail after logout because it is blacklisted."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

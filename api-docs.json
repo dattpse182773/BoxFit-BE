@@ -1,0 +1,172 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+	"title": "BoxFit API",
+	"version": "v1",
+	"description": "Current BoxFit backend API surface. Auth is implemented; the remaining modules are listed in the requested product hierarchy order for planned expansion."
+  },
+  "servers": [
+	{
+	  "url": "http://localhost:8080",
+	  "description": "Local development server"
+	}
+  ],
+  "tags": [
+	{ "name": "Auth", "description": "Implemented authentication endpoints" },
+	{ "name": "Category", "description": "Planned module" },
+	{ "name": "Collection", "description": "Planned module" },
+	{ "name": "Product", "description": "Planned module" },
+	{ "name": "Product Variant", "description": "Planned module" },
+	{ "name": "Inventory", "description": "Planned module" },
+	{ "name": "Cart", "description": "Planned module" },
+	{ "name": "Order", "description": "Planned module" },
+	{ "name": "Payment", "description": "Planned module" },
+	{ "name": "Promotion", "description": "Planned module" },
+	{ "name": "Review", "description": "Planned module" },
+	{ "name": "Newsletter", "description": "Planned module" }
+  ],
+  "paths": {
+	"/api/auth/register": {
+	  "post": {
+		"tags": ["Auth"],
+		"summary": "Register a new user",
+		"requestBody": {
+		  "required": true,
+		  "content": {
+			"application/json": {
+			  "schema": { "$ref": "#/components/schemas/RegisterRequest" }
+			}
+		  }
+		},
+		"responses": {
+		  "200": {
+			"description": "User registered successfully",
+			"content": {
+			  "application/json": {
+				"schema": { "$ref": "#/components/schemas/ApiResponseUserResponse" }
+			  }
+			}
+		  },
+		  "400": { "description": "Validation error" }
+		}
+	  }
+	},
+	"/api/auth/login": {
+	  "post": {
+		"tags": ["Auth"],
+		"summary": "Authenticate a user and issue an access token",
+		"requestBody": {
+		  "required": true,
+		  "content": {
+			"application/json": {
+			  "schema": { "$ref": "#/components/schemas/LoginRequest" }
+			}
+		  }
+		},
+		"responses": {
+		  "200": {
+			"description": "User authenticated successfully",
+			"content": {
+			  "application/json": {
+				"schema": { "$ref": "#/components/schemas/ApiResponseAuthResponse" }
+			  }
+			}
+		  },
+		  "400": { "description": "Validation error" }
+		}
+	  }
+	},
+	"/api/auth/logout": {
+	  "post": {
+		"tags": ["Auth"],
+		"summary": "Invalidate the current access token",
+		"parameters": [
+		  {
+			"name": "Authorization",
+			"in": "header",
+			"required": false,
+			"schema": { "type": "string" },
+			"description": "Bearer token in the form `Bearer <token>`"
+		  }
+		],
+		"responses": {
+		  "200": {
+			"description": "Token invalidated successfully",
+			"content": {
+			  "application/json": {
+				"schema": { "$ref": "#/components/schemas/LogoutResponse" }
+			  }
+			}
+		  },
+		  "401": { "description": "Missing, invalid, or expired token" }
+		}
+	  }
+	}
+  },
+  "components": {
+	"schemas": {
+	  "RegisterRequest": {
+		"type": "object",
+		"required": ["email", "password", "fullName"],
+		"properties": {
+		  "email": { "type": "string", "format": "email" },
+		  "password": { "type": "string", "minLength": 8 },
+		  "fullName": { "type": "string" },
+		  "phoneNumber": { "type": "string", "nullable": true }
+		}
+	  },
+	  "LoginRequest": {
+		"type": "object",
+		"required": ["email", "password"],
+		"properties": {
+		  "email": { "type": "string", "format": "email" },
+		  "password": { "type": "string" }
+		}
+	  },
+	  "UserResponse": {
+		"type": "object",
+		"properties": {
+		  "id": { "type": "string", "format": "uuid" },
+		  "email": { "type": "string", "format": "email" },
+		  "fullName": { "type": "string" },
+		  "phoneNumber": { "type": "string", "nullable": true },
+		  "role": { "type": "string", "enum": ["ADMIN", "STAFF", "CUSTOMER"] },
+		  "active": { "type": "boolean" },
+		  "createdAt": { "type": "string", "format": "date-time" },
+		  "updatedAt": { "type": "string", "format": "date-time" }
+		}
+	  },
+	  "AuthResponse": {
+		"type": "object",
+		"properties": {
+		  "user": { "$ref": "#/components/schemas/UserResponse" },
+		  "accessToken": { "type": "string" }
+		}
+	  },
+	  "LogoutResponse": {
+		"type": "object",
+		"properties": {
+		  "success": { "type": "boolean" },
+		  "message": { "type": "string" }
+		}
+	  },
+	  "ApiResponseUserResponse": {
+		"type": "object",
+		"properties": {
+		  "success": { "type": "boolean" },
+		  "message": { "type": "string" },
+		  "data": { "$ref": "#/components/schemas/UserResponse" }
+		}
+	  },
+	  "ApiResponseAuthResponse": {
+		"type": "object",
+		"properties": {
+		  "success": { "type": "boolean" },
+		  "message": { "type": "string" },
+		  "data": { "$ref": "#/components/schemas/AuthResponse" }
+		}
+	  }
+	}
+  }
+}
+
