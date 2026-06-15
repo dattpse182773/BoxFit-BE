@@ -1,24 +1,17 @@
 package com.boxfit.backend.domain.entity;
 
-import com.boxfit.backend.domain.enums.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.util.UUID;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Tuple;
-import jakarta.persistence.ColumnResult;
-import jakarta.persistence.ConstructorResult;
-import jakarta.persistence.SqlResultSetMapping;
-
-import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
@@ -40,8 +33,8 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
     @Column(name = "is_active", nullable = false)
@@ -89,7 +82,6 @@ public class User {
         Instant now = Instant.now();
         createdAt = now;
         updatedAt = now;
-        if (role == null) role = Role.CUSTOMER;
     }
 
     @PreUpdate
